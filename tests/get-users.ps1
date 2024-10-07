@@ -1,0 +1,1 @@
+Get-Aduser -Filter { SamAccountName -like "*Jordy*" } | Select-Object Name, SamAccountName, UserPrincipalName | Format-Table -AutoSize
