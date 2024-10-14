@@ -53,5 +53,7 @@ Start-VM -VM $vm
 # Display IP address
 Write-Host "IP of $vmName is $vmIP"
 
+
+
 # Disconnect from vCenter
 Disconnect-VIServer -Server $vcServer -Confirm:$false
