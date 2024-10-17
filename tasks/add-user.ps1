@@ -1,6 +1,7 @@
 param (
   [string]$fullname,
-  [string]$department
+  [string]$department,
+  [string]$password
 )
 
 $company = "Hoebergen"
@@ -13,12 +14,12 @@ if (-not $department) {
   $department = Read-Host "Please provide the department of the user"
 }
 
-if (-not $password) {
-  $password = Read-Host "Please provide the password of the user" -AsSecureString
+if ($password) {
+  $secpassword = ConvertTo-SecureString $password -AsPlainText -Force
 }
 
-if (-not $company) {
-  $company = Read-Host "Please provide the company of the user"
+if (-not $password) {
+  $password = Read-Host "Please provide the password of the user" -AsSecureString
 }
 
 # Import the Active Directory module
@@ -44,7 +45,7 @@ New-ADUser `
   -GivenName $firstname `
   -SamAccountName $username `
   -UserPrincipalName "$username@hoebergen.internal" `
-  -AccountPassword $password `
+  -AccountPassword $secpassword `
   -Company $company `
   -Department $department `
   -Path "OU=Gebruikers,DC=hoebergen,DC=internal" `
