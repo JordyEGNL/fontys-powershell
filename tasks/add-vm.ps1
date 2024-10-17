@@ -1,14 +1,19 @@
 param (
   [string]$vmName,
-  [string]$vcPassword
+  [string]$vcPassword,
+  [string]$vmIP
 )
 
 if (-not $vmName) {
-  $vmName = Read-Host "Please provide the name of the VM"
+  $vmName = Read-Host "Please provide the name of the VM (ex: TestVM)"
 }
 
 if (-not $vcPassword) {
   $vcPassword = Read-Host "Please provide the password of the vCenter"
+}
+
+if (-not $vmIP) {
+  $vmIP = Read-Host "Please provide the IP of the VM (ex: 172.16.3.x)"
 }
 
 ## Vcenter connection
@@ -20,10 +25,10 @@ Connect-VIServer -Server $vcServer -User $vcUser -Password $vcPassword
 # VM variables
 $resourcePool = "I533550"
 $folder = "I533550"
-$template = "UbuntuServer"
+$template = "Windows10T"
 $datastore = "DataCluster-Students"
 $networkName = "2721_I533550_PVlanB"
-$vmIP = "172.16.3.55"
+#$vmIP = "172.16.3.55"
 
 # Create a new VM from a template
 # Clone the VM from template (without -Cluster parameter)
@@ -52,7 +57,6 @@ Start-VM -VM $vm
 
 # Display IP address
 Write-Host "IP of $vmName is $vmIP"
-
 
 
 # Disconnect from vCenter
