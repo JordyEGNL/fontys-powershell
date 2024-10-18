@@ -67,7 +67,7 @@ if ($vm) {
     # If VM already exist
     $vm = Get-VM -Name $vmName
     if ($vm) {
-        Write-Host "VM already exists."
+        Write-Host "VM already exists, not creating."
     } else {
         Write-Error "Failed to create VM."
     }
@@ -135,7 +135,7 @@ if ($domainCheckResult -match 'Not in domain') {
     # Execute the command in the SSH session
     Invoke-Expression "$sshSession `powershell -Command `"$remoteCommand`"" | Out-Null
 } else {
-    Write-Host "The computer is already in the domain $domain."
+    Write-Host "$vmName ($vmIP) is already in the domain $domain."
 }
 
 # Ensure the SSH process is terminated
