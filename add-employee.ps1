@@ -1,9 +1,10 @@
 param (
     [string]$fullName,
     [string]$department,
-    [string]$vmIP,
     [string]$vcUsername,
     [string]$vcPassword,
+    [string]$adminUsername,
+    [string]$adminPassword,
     [switch]$debug
 )
 
@@ -19,16 +20,17 @@ function Show-WelcomeMessage {
     Write-Output "Usage: ./add-employee.ps1 <OPTIONS>"
     Write-Output ""
     Write-Output "Options:"
-    Write-Output "-fullname string      The full name of the employee"
-    Write-Output "-department string    The department of the employee"
-    Write-Output "-vmip string          The IP address of the virtual machine"
-    Write-Output "-vcusername string    The username of the vCenter Administrator"
-    Write-Output "-vcpassword string    The password of the vCenter Administrator"
-    Write-Output "-debug                Enable debug mode"
+    Write-Output "-fullname string          The full name of the employee"
+    Write-Output "-department string        The department of the employee"
+    Write-Output "-vcusername string        The username of the vCenter Administrator"
+    Write-Output "-vcpassword string        The password of the vCenter Administrator"
+    Write-Output "-adminusername string     The username of the domain admin"
+    Write-Output "-adminpassword string     The password of the domain admin"
+    Write-Output "-debug                    Enable debug mode"
     Write-Output ""
 }
 
-if (!$fullName -or !$department -or !$vmIP) {
+if (!$fullName -or !$department -or !$vcUsername -or !$vcPassword -or !$adminUsername -or !$adminPassword) {
     Show-WelcomeMessage
     exit 0
 }
@@ -37,7 +39,10 @@ Write-Debug "Full Name: $fullName"
 $firstName = $fullName.Split(" ")[0]
 $randomVMID= Get-Random -Minimum 10 -Maximum 99
 Write-Debug "department: $department"
-Write-Debug "Virtual Machine IP: $vmIP"
+Write-Debug "vcUsername: $vcUsername"
+Write-Debug "vcPassword: $vcPassword"
+Write-Debug "adminUsername: $adminUsername"
+Write-Debug "adminPassword: $adminPassword"
 
 # Random generate password of 3 words from
 # https://github.com/OpenTaal/opentaal-wordlist
@@ -63,7 +68,7 @@ if ($debug) {
 }
 
 if ($debug) {
-    ./tasks/add-vm.ps1 -vmName VM-$firstName-$randomVMID -vcUsername $vcUsername -vcPassword $vcPassword -debug
+    ./tasks/add-vm.ps1 -vmname VM-$firstName-$randomVMID -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword -debug
 } else {
-    ./tasks/add-vm.ps1 -vmName VM-$firstName-$randomVMID -vcUsername $vcUsername -vcPassword $vcPassword
+    ./tasks/add-vm.ps1 -vmname VM-$firstName-$randomVMID -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword
 }

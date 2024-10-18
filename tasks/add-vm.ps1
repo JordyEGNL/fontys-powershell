@@ -97,7 +97,7 @@ if ((Get-VM -Name $vmName).PowerState -ne 'PoweredOn') {
 # Retrieve the IP address of the VM from the vCenter try again every 10 seconds
 # Regex from https://www.powershelladmin.com/wiki/PowerShell_regex_to_accurately_match_IPv4_address_(0-255_only).php
 $attempts = 1
-$maxAttempts = 6
+$maxAttempts = 10
 while (-not $vmIP -and $attempts -lt $maxAttempts) {
   $vmIP = (Get-VM -Name $vmName).Guest.IPAddress | Where-Object { $_ -match '^(?:(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$' }
   Start-Sleep -Seconds 10
@@ -150,6 +150,7 @@ if ($domainCheckResult -match 'Not in domain') {
     $remoteCommand = "Add-Computer -Domain $domain -Credential (New-Object System.Management.Automation.PSCredential('$adminUsername', (ConvertTo-SecureString '$adminPassword' -AsPlainText -Force))) -NewName '$vmName' -Restart -Force"
     # Execute the command in the SSH session
     Invoke-Expression "$sshSession `powershell -Command `"$remoteCommand`"" | Out-Null
+    Write-Host "$vmName ($vmIP) has been added to the domain $domain."
 } else {
     Write-Host "$vmName ($vmIP) is already in the domain $domain."
 }
