@@ -1,5 +1,6 @@
 param (
   [string]$vmName,
+  [string]$vcUsername,
   [string]$vcPassword,
   [string]$adminUsername,
   [string]$adminPassword,
@@ -28,9 +29,8 @@ if (-not $adminPassword) {
 
 ## Vcenter connection
 $vcServer = "vcenter.netlab.fontysict.nl"
-$vcUser = "i533550@fontysict.nl"
 
-Connect-VIServer -Server $vcServer -User $vcUser -Password $vcPassword
+Connect-VIServer -Server $vcServer -User $vcUsername -Password $vcPassword
 
 # VM variables
 $resourcePool = "I533550"
