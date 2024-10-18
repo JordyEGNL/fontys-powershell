@@ -12,6 +12,7 @@ if ($debug) {
 Write-Debug "-- Debugging add-user.ps1 --"
 
 $company = "Hoebergen"
+$domain = "hoebergen.internal"
 
 if (-not $fullname) {
   $fullname = Read-Host "Please provide the full name of the user"
@@ -60,7 +61,7 @@ New-ADUser `
   -Surname $lastname `
   -GivenName $firstname `
   -SamAccountName $username `
-  -UserPrincipalName "$username@hoebergen.internal" `
+  -UserPrincipalName "$username@$domain" `
   -AccountPassword $secpassword `
   -Company $company `
   -Department $department `
