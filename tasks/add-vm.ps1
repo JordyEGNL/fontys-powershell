@@ -80,17 +80,18 @@ if ((Get-VM -Name $vmName).PowerState -ne 'PoweredOn') {
 
 # Retrieve the IP address of the VM from the vCenter try again every 10 seconds
 # Regex from https://www.powershelladmin.com/wiki/PowerShell_regex_to_accurately_match_IPv4_address_(0-255_only).php
-$attempts = 0
+$attempts = 1
 $maxAttempts = 6
 while (-not $vmIP -and $attempts -lt $maxAttempts) {
   $vmIP = (Get-VM -Name $vmName).Guest.IPAddress | Where-Object { $_ -match '^(?:(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$' }
   Start-Sleep -Seconds 10
-  Write-Debug "Trying to get the IP address of $vmName... ($attempt/$maxAttempts)"
+  Write-Debug "Trying to get the IP address of $vmName... ($attempts/$maxAttempts)"
   $attempts++
 }
 
 if (-not $vmIP) {
   Write-Error "Failed to retrieve the IP address of $vmName after $maxAttempts attempts."
+  exit 1
 }
 
 # Display IP address
@@ -134,7 +135,7 @@ if ($domainCheckResult -match 'Not in domain') {
     # Execute the command in the SSH session
     Invoke-Expression "$sshSession `powershell -Command `"$remoteCommand`"" | Out-Null
 } else {
-    Write-Host "The computer is already in the domain."
+    Write-Host "The computer is already in the domain $domain."
 }
 
 # Ensure the SSH process is terminated
