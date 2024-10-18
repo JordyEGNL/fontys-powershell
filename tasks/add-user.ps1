@@ -2,6 +2,7 @@ param (
   [string]$fullname,
   [string]$department,
   [string]$password,
+  [securestring]$secpassword,
   [switch]$debug
 )
 
@@ -26,14 +27,14 @@ if ($password) {
   $secpassword = ConvertTo-SecureString $password -AsPlainText -Force
 }
 
+if (-not $password -and -not $secpassword) {
+  $password = Read-Host "Please provide the password of the user" -AsSecureString
+}
+
 Write-Debug "Full Name: $fullname"
 Write-Debug "Department: $department"
 Write-Debug "Password: $password"
 Write-Debug "Secure Password: $secpassword"
-
-if (-not $password -and -not $secpassword) {
-  $password = Read-Host "Please provide the password of the user" -AsSecureString
-}
 
 # Import the Active Directory module
 Import-Module ActiveDirectory
