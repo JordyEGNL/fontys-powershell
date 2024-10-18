@@ -15,8 +15,12 @@ if (-not $vmName) {
   $vmName = Read-Host "Please provide the name of the VM (ex: TestVM)"
 }
 
+if (-not $vcUsername) {
+  $vcUsername = Read-Host "Please provide the username of the vCenter Administrator"
+}
+
 if (-not $vcPassword) {
-  $vcPassword = Read-Host "Please provide the password of the vCenter"
+  $vcPassword = Read-Host "Please provide the password of the vCenter Administrator"
 }
 
 if (-not $adminUsername) {
@@ -30,7 +34,13 @@ if (-not $adminPassword) {
 ## Vcenter connection
 $vcServer = "vcenter.netlab.fontysict.nl"
 
-Connect-VIServer -Server $vcServer -User $vcUsername -Password $vcPassword
+try {
+  Connect-VIServer -Server $vcServer -User $vcUsername -Password $vcPassword -ErrorAction Stop
+  Write-Debug "Successfully connected to vCenter server $vcServer."
+} catch {
+  Write-Error "Failed to connect to vCenter server $vcServer. $_"
+  exit 1
+}
 
 # VM variables
 $resourcePool = "I533550"
@@ -70,9 +80,17 @@ if ((Get-VM -Name $vmName).PowerState -ne 'PoweredOn') {
 
 # Retrieve the IP address of the VM from the vCenter try again every 10 seconds
 # Regex from https://www.powershelladmin.com/wiki/PowerShell_regex_to_accurately_match_IPv4_address_(0-255_only).php
-while (-not $vmIP) {
-    $vmIP = (Get-VM -Name $vmName).Guest.IPAddress | Where-Object { $_ -match '^(?:(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$' }
-    Start-Sleep -Seconds 10
+$attempts = 0
+$maxAttempts = 6
+while (-not $vmIP -and $attempts -lt $maxAttempts) {
+  $vmIP = (Get-VM -Name $vmName).Guest.IPAddress | Where-Object { $_ -match '^(?:(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$' }
+  Start-Sleep -Seconds 10
+  Write-Debug "Trying to get the IP address of $vmName... ($attempt/$maxAttempts)"
+  $attempts++
+}
+
+if (-not $vmIP) {
+  Write-Error "Failed to retrieve the IP address of $vmName after $maxAttempts attempts."
 }
 
 # Display IP address
@@ -99,14 +117,25 @@ $sshcredential = New-Object System.Management.Automation.PSCredential($sshUser, 
 
 # Construct the SSH command to start a session
 $sshSession = "ssh -o StrictHostKeyChecking=no $($sshcredential.UserName)@$vmIP"
-$sshProcess = Start-Process -FilePath "powershell.exe" -ArgumentList "-NoExit", "-Command", $sshSession -PassThru
+$sshProcess = Start-Process -FilePath "powershell.exe" -ArgumentList "-NoExit", "-Command", $sshSession -WindowStyle Hidden -PassThru
 
 Start-Sleep -Seconds 5
 
-#add computer command
-$remoteCommand = "Add-Computer -Domain $domain -Credential (New-Object System.Management.Automation.PSCredential('$adminUsername', (ConvertTo-SecureString '$adminPassword' -AsPlainText -Force))) -NewName '$vmName' -Restart -Force"
+# Check if the computer is already in the domain
+# https://www.alexandrumarin.com/check-if-a-system-is-joined-to-domain-using-powershell/
+$domainCheckCommand = "if ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) { Write-Host 'Already in domain' } else { Write-Host 'Not in domain' }"
+$domainCheckResult = Invoke-Expression "$sshSession `powershell -Command `"$domainCheckCommand`"" | Out-String
 
-# Execute the command in the SSH session
-Invoke-Expression "$sshSession `powershell -Command `"$remoteCommand`"" | Out-Null
+# If the computer is not in the domain, add it
+# Made with Karsten S
+if ($domainCheckResult -match 'Not in domain') {
+    # Add computer command
+    $remoteCommand = "Add-Computer -Domain $domain -Credential (New-Object System.Management.Automation.PSCredential('$adminUsername', (ConvertTo-SecureString '$adminPassword' -AsPlainText -Force))) -NewName '$vmName' -Restart -Force"
+    # Execute the command in the SSH session
+    Invoke-Expression "$sshSession `powershell -Command `"$remoteCommand`"" | Out-Null
+} else {
+    Write-Host "The computer is already in the domain."
+}
 
-Stop-Process -Id $sshProcess.Id
+# Ensure the SSH process is terminated
+Stop-Process -Id $sshProcess.Id -Force
