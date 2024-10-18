@@ -2,6 +2,7 @@ param (
     [string]$fullName,
     [string]$department,
     [string]$vmIP,
+    [string]$vcPassword,
     [switch]$debug
 )
 
@@ -20,6 +21,7 @@ function Show-WelcomeMessage {
     Write-Output "-fullname string      The full name of the employee"
     Write-Output "-department string    The department of the employee"
     Write-Output "-vmip string          The IP address of the virtual machine"
+    Write-Output "-vcpassword string    The password of the vCenter Administrator"
     Write-Output "-debug                Enable debug mode"
     Write-Output ""
 }
@@ -30,6 +32,8 @@ if (!$fullName -or !$department -or !$vmIP) {
 }
 
 Write-Debug "Full Name: $fullName"
+$firstName = $fullName.Split(" ")[0]
+$randomVMID= Get-Random -Minimum 10 -Maximum 99
 Write-Debug "department: $department"
 Write-Debug "Virtual Machine IP: $vmIP"
 
@@ -54,4 +58,8 @@ if ($debug) {
     ./tasks/add-user.ps1 -fullName $fullName -department $department -secpassword $secpassword -debug
 } else {
     ./tasks/add-user.ps1 -fullName $fullName -department $department -secpassword $secpassword
+}
+
+if ($debug) {
+    ./tasks/add-vm.ps1 -vmName VM-$firstName-$randomVMID -vcPassword $vcPassword -debug
 }
