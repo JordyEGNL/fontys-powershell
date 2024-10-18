@@ -31,6 +31,13 @@ if (-not $adminPassword) {
   $adminPassword = Read-Host "Please provide the password of the domain admin"
 }
 
+Write-Debug "-- Debugging add-vm.ps1 --"
+Write-Debug "VM Name: $vmName"
+Write-Debug "vCenter Username: $vcUsername"
+Write-Debug "vCenter Password: $vcPassword"
+Write-Debug "Admin Username: $adminUsername"
+Write-Debug "Admin Password: $adminPassword"
+
 ## Vcenter connection
 $vcServer = "vcenter.netlab.fontysict.nl"
 
@@ -47,12 +54,12 @@ $resourcePool = "I533550"
 $folder = "I533550"
 $template = "Windows10T"
 $datastore = "DataCluster-Students"
-$networkName = "2721_I533550_PVlanA"
+$networkName = "2720_I533550_PVlanA"
 
 # Check if the VM already exists, if not create vm
-if (-not (Get-VM -Name $vmName)) {
-
-$vm = New-VM -Name $vmName `
+if (-not (Get-VM -Name $vmName -ErrorAction SilentlyContinue)) {
+  Write-Debug "Creating a new VM from a template..."
+  $vm = New-VM -Name $vmName `
     -Template $template `
     -Datastore $datastore `
     -ResourcePool $resourcePool `
@@ -61,15 +68,24 @@ $vm = New-VM -Name $vmName `
 
 # Ensure the VM was successfully created before configuring the network
 if ($vm) {
-    # Configure the network adapter separately
-    Get-NetworkAdapter -VM $vm | Set-NetworkAdapter -NetworkName $networkName -Confirm:$false
+    Write-Debug "Checking if network adapter is already set..."
+    $networkAdapter = Get-NetworkAdapter -VM $vm
+    Write-Debug "Network adapter thats currently set: $($networkAdapter.NetworkName)"
+    if ($networkAdapter.NetworkName -ne $networkName) {
+      Write-Debug "Changing network adapter..."
+      # Configure the network adapter separately
+      $networkAdapter | Set-NetworkAdapter -NetworkName $networkName -Confirm:$false
+    } else {
+      Write-Debug "Network adapter is already set to $networkName."
+    }
 } else {
-    # If VM already exist
+    # If VM already exists
     $vm = Get-VM -Name $vmName
     if ($vm) {
         Write-Host "VM already exists, not creating."
     } else {
         Write-Error "Failed to create VM."
+        exit 1
     }
 }
 
