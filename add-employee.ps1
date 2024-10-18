@@ -50,5 +50,8 @@ $word1 = $null
 $word2 = $null
 $word3 = $null
 
-./tasks/add-user.ps1 -fullName $fullName -department $department -secpassword $secpassword -debug
-
+if ($debug) {
+    ./tasks/add-user.ps1 -fullName $fullName -department $department -secpassword $secpassword -debug
+} else {
+    ./tasks/add-user.ps1 -fullName $fullName -department $department -secpassword $secpassword
+}
