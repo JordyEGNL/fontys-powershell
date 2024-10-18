@@ -1,8 +1,15 @@
 param (
   [string]$fullname,
   [string]$department,
-  [string]$password
+  [string]$password,
+  [switch]$debug
 )
+
+if ($debug) {
+  $DebugPreference = "Continue"
+}
+
+Write-Debug "-- Debugging add-user.ps1 --"
 
 $company = "Hoebergen"
 
@@ -18,7 +25,12 @@ if ($password) {
   $secpassword = ConvertTo-SecureString $password -AsPlainText -Force
 }
 
-if (-not $password) {
+Write-Debug "Full Name: $fullname"
+Write-Debug "Department: $department"
+Write-Debug "Password: $password"
+Write-Debug "Secure Password: $secpassword"
+
+if (-not $password -and -not $secpassword) {
   $password = Read-Host "Please provide the password of the user" -AsSecureString
 }
 
@@ -36,6 +48,10 @@ $lastname = $names[1]
 
 # Create a username from the first and last name
 $username = "$firstname.$lastname".ToLower()
+
+Write-Debug "First Name: $firstname"
+Write-Debug "Last Name: $lastname"
+Write-Debug "Username: $username"
 
 # Create the new AD user
 New-ADUser `
@@ -55,3 +71,5 @@ New-ADUser `
 Write-Output "User $fullname created successfully."
 
 $ErrorActionPreference = $ExistingEAP
+
+exit 0
