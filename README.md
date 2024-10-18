@@ -35,8 +35,15 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ## Usage Example
 ```powershell
-# Get all users in the domain
-Get-ADUser -Filter *
+Usage: ./add-employee.ps1 <OPTIONS>
+
+Options:
+-fullname string      The full name of the employee
+-department string    The department of the employee
+-vmip string          The IP address of the virtual machine
+-vcusername string    The username of the vCenter Administrator
+-vcpassword string    The password of the vCenter Administrator
+-debug                Enable debug mode
 ```
 
 ## Additional Resources
