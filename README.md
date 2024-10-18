@@ -38,12 +38,13 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 Usage: ./add-employee.ps1 <OPTIONS>
 
 Options:
--fullname string      The full name of the employee
--department string    The department of the employee
--vmip string          The IP address of the virtual machine
--vcusername string    The username of the vCenter Administrator
--vcpassword string    The password of the vCenter Administrator
--debug                Enable debug mode
+-fullname string          The full name of the employee
+-department string        The department of the employee
+-vcusername string        The username of the vCenter Administrator
+-vcpassword string        The password of the vCenter Administrator
+-adminusername string     The username of the domain admin
+-adminpassword string     The password of the domain admin
+-debug                    Enable debug mode
 ```
 
 ## Additional Resources
