@@ -1,3 +1,12 @@
+# Create new VM from template
+#
+# Usage:
+# ./add-employee.ps1 <OPTIONS>
+#
+# vcUsername and vcPassword are optional for the vCenter connection
+# adminUsername and adminPassword are optional for the domain join
+# Both can be globally set with ./set-env.ps1 or temp set with the script as arguments
+
 param (
   [string]$fullName,
   [string]$department,

@@ -1,4 +1,7 @@
 # Script used to set the variables for the add-employee script
+#
+# Usage:
+# ./set-env.ps1 <OPTIONS>
 
 param (
   [string]$vcAdminUsername,

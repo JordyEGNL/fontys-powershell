@@ -1,3 +1,8 @@
+# Add user to Active Directory
+#
+# Usage:
+# ./add-user.ps1 <OPTIONS>
+
 param (
   [string]$fullname,
   [string]$department,
