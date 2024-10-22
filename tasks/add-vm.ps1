@@ -11,6 +11,22 @@ if ($debug) {
   $DebugPreference = "Continue"
 }
 
+if (!$vcUsername) {
+  $vcUsername = $env:employeescript_vcAdminUsername
+} 
+
+if (!$vcPassword) {
+  $vcPassword = $env:employeescript_vcAdminPassword
+}
+
+if (!$adminUsername) {
+  $adminUsername = $env:employeescript_domainAdminUsername
+}
+
+if (!$adminPassword) {
+  $adminPassword = $env:employeescript_domainAdminPassword
+}
+
 if (-not $vmName) {
   $vmName = Read-Host "Please provide the name of the VM (ex: TestVM)"
 }

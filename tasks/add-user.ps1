@@ -13,8 +13,17 @@ if ($debug) {
 
 Write-Debug "-- Debugging add-user.ps1 --"
 
-$company = "Hoebergen"
-$domain = "hoebergen.internal"
+if (!$domain) {
+  $domain = $env:employeescript_domain
+}
+
+if (!$company) {
+  $company = $env:employeescript_company
+}
+
+if (!$domain -or !$company) {
+  Write-Error "Domain and/or company not set. Please run set-env.ps1 first." -ErrorAction Stop
+}
 
 if (-not $fullname) {
   $fullname = Read-Host "Please provide the full name of the user"
