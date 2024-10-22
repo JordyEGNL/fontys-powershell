@@ -60,6 +60,7 @@ Options:
   -domainAdminPassword <domainAdminPassword>
   -company <company>
   -domain <domain>
+  -list
 ```
 
 ## Additional Resources
