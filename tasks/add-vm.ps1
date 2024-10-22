@@ -1,3 +1,12 @@
+# Create new VM from template
+#
+# Usage:
+# ./add-vm.ps1 <OPTIONS>
+#
+# vcUsername and vcPassword are optional for the vCenter connection
+# adminUsername and adminPassword are optional for the domain join
+# Both can be globally set with ../set-env.ps1 or temp set with the script as arguments
+
 param (
   [string]$vmName,
   [string]$vcUsername,
@@ -133,7 +142,9 @@ Write-Debug "IP of $vmName is $vmIP"
 Disconnect-VIServer -Server $vcServer -Confirm:$false
 
 
-# ---- Add to domain ----
+###############################################
+# Domain join
+###############################################
 
 # Domain information
 $adminUsername = "HOEBERGEN\" + $adminUsername
@@ -167,8 +178,11 @@ if ($domainCheckResult -match 'Not in domain') {
     # Execute the command in the SSH session
     Invoke-Expression "$sshSession `powershell -Command `"$remoteCommand`"" | Out-Null
     Write-Host "$vmName ($vmIP) has been added to the domain $domain."
-} else {
+} if ($domainCheckResult -match 'Already in domain') {
     Write-Host "$vmName ($vmIP) is already in the domain $domain."
+} else {
+    # On connection error, for example ssh timeout
+    Write-Error "Failed to check if $vmName is in the domain." -ErrorAction Stop
 }
 
 # Ensure the SSH process is terminated
