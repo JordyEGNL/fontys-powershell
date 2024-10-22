@@ -116,7 +116,7 @@ $attempts = 1
 $maxAttempts = 10
 while (-not $vmIP -and $attempts -lt $maxAttempts) {
   $vmIP = (Get-VM -Name $vmName).Guest.IPAddress | Where-Object { $_ -match '^(?:(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)\.){3}(?:0?0?\d|0?[1-9]\d|1\d\d|2[0-5][0-5]|2[0-4]\d)$' }
-  Start-Sleep -Seconds 10
+  Start-Sleep -Seconds 20
   Write-Debug "Trying to get the IP address of $vmName... ($attempts/$maxAttempts)"
   $attempts++
 }
