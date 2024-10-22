@@ -63,6 +63,8 @@ New-ADUser `
   -GivenName $firstname `
   -SamAccountName $username `
   -UserPrincipalName "$username@$domain" `
+  -EmailAddress "$username@$domain" `
+  -ProfilePath "\\ORC-DC-01\ProfileFolders$\$username" `
   -AccountPassword $secpassword `
   -Company $company `
   -Department $department `
