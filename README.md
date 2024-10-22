@@ -34,17 +34,32 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 ## Usage Example
+
+### Create new user
 ```powershell
 Usage: ./add-employee.ps1 <OPTIONS>
 
 Options:
--fullname string          The full name of the employee
--department string        The department of the employee
--vcusername string        The username of the vCenter Administrator
--vcpassword string        The password of the vCenter Administrator
--adminusername string     The username of the domain admin
--adminpassword string     The password of the domain admin
--debug                    Enable debug mode
+  -fullname string          The full name of the employee
+  -department string        The department of the employee
+  -vcusername string        The username of the vCenter Administrator
+  -vcpassword string        The password of the vCenter Administrator
+  -adminusername string     The username of the domain admin
+  -adminpassword string     The password of the domain admin
+  -debug                    Enable debug mode
+```
+
+### Set config variables
+```powershell
+Usage: ./set-env.ps1 <OPTIONS>
+
+Options:
+  -vcAdminUsername <vcAdminUsername>
+  -vcAdminPassword <vcAdminPassword>
+  -domainAdminUsername <domainAdminUsername>
+  -domainAdminPassword <domainAdminPassword>
+  -company <company>
+  -domain <domain>
 ```
 
 ## Additional Resources
