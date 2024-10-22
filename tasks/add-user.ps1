@@ -36,7 +36,7 @@ if (-not $password -and -not $secpassword) {
   $password = Read-Host "Please provide the password of the user" -AsSecureString
 }
 
-# Check if the department is valid
+# Check if the department group exists
 $departmentGroup = "Functiegroep_" + $department
 $validDepartments = Get-ADGroup -Filter {GroupCategory -eq "Security"} | Select-Object -ExpandProperty Name | Where-Object { $_ -like "Functiegroep_*" }
 if ($validDepartments -notcontains $departmentGroup) {
@@ -44,8 +44,17 @@ if ($validDepartments -notcontains $departmentGroup) {
     Write-Error "Valid validDepartments are: $($validDepartments -join ', ')" -ErrorAction Stop
 }
 
+# Check if the department ou exists
+$departmentOU = "OU=$department,OU=Gebruikers,DC=hoebergen,DC=internal"
+if (-not (Get-ADOrganizationalUnit -Filter {Name -eq $department})) {
+    Write-Error "Department $department not found in local AD."
+    Write-Error "Please create the OU '$departmentOU' first." -ErrorAction Stop
+}
+
 Write-Debug "Full Name: $fullname"
 Write-Debug "Department: $department"
+Write-Debug "Department Group: $departmentGroup"
+Write-Debug "Department OU: $departmentOU"
 Write-Debug "Password: $password"
 Write-Debug "Secure Password: $secpassword"
 
@@ -79,7 +88,7 @@ try {
     -AccountPassword $secpassword `
     -Company $company `
     -Department $department `
-    -Path "OU=Gebruikers,DC=hoebergen,DC=internal" `
+    -Path "OU=$department,OU=Gebruikers,DC=hoebergen,DC=internal" `
     -Enabled $true `
     -ChangePasswordAtLogon $true
 } catch {
