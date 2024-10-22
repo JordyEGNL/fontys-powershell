@@ -55,16 +55,22 @@ $word3 = $words | Get-Random
 Write-Debug "Password: $password"
 [securestring]$secpassword = ConvertTo-SecureString "$password" -AsPlainText -Force
 # Clear variables
-$password = $null
 $words = $null
 $word1 = $null
 $word2 = $null
 $word3 = $null
 
+# Split the fullname into first and last name
+$names = $fullname -split ' '
+$firstname = $names[0]
+$lastname = $names[1]
+# Create a username from the first and last name
+$username = "$firstname.$lastname".ToLower()
+
 if ($debug) {
-    ./tasks/add-user.ps1 -fullName $fullName -department $department -secpassword $secpassword -debug
+    ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -secpassword $secpassword -debug
 } else {
-    ./tasks/add-user.ps1 -fullName $fullName -department $department -secpassword $secpassword
+    ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -secpassword $secpassword
 }
 
 if ($debug) {
@@ -72,3 +78,9 @@ if ($debug) {
 } else {
     ./tasks/add-vm.ps1 -vmname VM-$firstName-$randomVMID -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword
 }
+
+# Send credentials
+Write-Host "---------------------"
+Write-Host "Username: $username"
+Write-Host "Password: $password"
+Write-Host "---------------------"

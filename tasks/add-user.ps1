@@ -1,6 +1,7 @@
 param (
   [string]$fullname,
   [string]$department,
+  [string]$username,
   [string]$password,
   [securestring]$secpassword,
   [switch]$debug
@@ -21,6 +22,10 @@ if (-not $fullname) {
 
 if (-not $department) {
   $department = Read-Host "Please provide the department of the user"
+}
+
+if (-not $username) {
+  $username = Read-Host "Please provide the username of the user"
 }
 
 if ($password) {
@@ -47,9 +52,6 @@ $ErrorActionPreference = "Stop"
 $names = $fullname -split ' '
 $firstname = $names[0]
 $lastname = $names[1]
-
-# Create a username from the first and last name
-$username = "$firstname.$lastname".ToLower()
 
 Write-Debug "First Name: $firstname"
 Write-Debug "Last Name: $lastname"
