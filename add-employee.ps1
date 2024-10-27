@@ -76,10 +76,10 @@ $words = Get-Content -Path "opentaal-worldlist\alleen-bijwoorden.txt"
 $word1 = $words | Get-Random
 $word2 = $words | Get-Random
 $word3 = $words | Get-Random
-
 [string]$password = "$word1-$word2-$word3"
 Write-Debug "Password: $password"
 [securestring]$secpassword = ConvertTo-SecureString "$password" -AsPlainText -Force
+
 # Clear variables
 $words = $null
 $word1 = $null
