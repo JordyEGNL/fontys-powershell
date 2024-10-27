@@ -178,11 +178,13 @@ if ($domainCheckResult -match 'Not in domain') {
     # Execute the command in the SSH session
     Invoke-Expression "$sshSession `powershell -Command `"$remoteCommand`"" | Out-Null
     Write-Host "$vmName ($vmIP) has been added to the domain $domain."
-} if ($domainCheckResult -match 'Already in domain') {
-    Write-Host "$vmName ($vmIP) is already in the domain $domain."
-} else {
-    # On connection error, for example ssh timeout
-    Write-Error "Failed to check if $vmName is in the domain." -ErrorAction Stop
+  } else {
+    if ($domainCheckResult -match 'Already in domain') {
+        Write-Host "$vmName ($vmIP) is already in the domain $domain."
+    } else {
+      # On connection error, for example ssh timeout
+      Write-Error "Failed to check if $vmName is in the domain." -ErrorAction Stop
+    }
 }
 
 # Ensure the SSH process is terminated
