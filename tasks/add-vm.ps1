@@ -221,3 +221,5 @@ if ($domainCheckResult -match 'Not in domain') {
 # domain join cleanup
 #
 Stop-Process -Id $sshProcess.Id -Force
+
+exit 0

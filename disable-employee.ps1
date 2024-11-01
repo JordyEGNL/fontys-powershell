@@ -59,14 +59,34 @@ if (!$username -or !$vcUsername -or !$vcPassword -or !$adminUsername -or !$admin
   exit 0
 }
 
+#
+# Retrieve the employeenumber from the username
+#
+# Split the username to get the first name
+$firstName = $username.Split(".")[0]
+
+$employeeNumber = (Get-ADUser -Identity $username -Properties EmployeeNumber).EmployeeNumber
+if (!$employeeNumber) {
+  Write-Error "The user $username does not exist in Active Directory." -ErrorAction Stop
+}
+
+$vmName = "VM-$firstName-$employeeNumber"
+
 Write-Debug "Username: $username"
+Write-Debug "Employee Number: $employeeNumber"
+Write-Debug "First Name: $firstName"
 Write-Debug "vcUsername: $vcUsername"
 Write-Debug "vcPassword: $vcPassword"
 Write-Debug "adminUsername: $adminUsername"
 Write-Debug "adminPassword: $adminPassword"
+Write-Debug "VM Name: $vmName"
 
 if ($debug) {
   ./tasks/disable-user.ps1 -username $username -debug
+  ./tasks/delete-vm.ps1 -vmName $vmName -vcUsername $vcUsername -vcPassword $vcPassword -debug
 } else {
   ./tasks/disable-user.ps1 -username $username
+  ./tasks/delete-vm.ps1 -vmName $vmName -vcUsername $vcUsername -vcPassword $vcPassword
 }
+
+Write-Output "Employee $username disabled and VM  $vmName deleted successfully."

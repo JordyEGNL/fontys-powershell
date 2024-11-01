@@ -97,13 +97,9 @@ $username = "$firstname.$lastname".ToLower()
 
 if ($debug) {
   ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -employeenumber $employeeNumber -secpassword $secpassword -debug
-} else {
-  ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -employeenumber $employeeNumber -secpassword $secpassword
-}
-
-if ($debug) {
   ./tasks/add-vm.ps1 -vmname VM-$firstName-$employeeNumber -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword -debug
 } else {
+  ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -employeenumber $employeeNumber -secpassword $secpassword
   ./tasks/add-vm.ps1 -vmname VM-$firstName-$employeeNumber -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword
 }
 
