@@ -37,6 +37,12 @@ Import-Module ActiveDirectory
 # https://stackoverflow.com/questions/26274361/powershell-new-aduser-error-handling-password-complexity-activedirectory-module
 $ErrorActionPreference = "Stop"
 
+# Check if the user has the Administrator role
+$user = Get-ADUser -Identity $username -Properties MemberOf
+if ($user.MemberOf -contains "CN=Administrators,CN=Builtin,DC=hoebergen,DC=internal" -or $user.MemberOf -contains "CN=Domain Admins,CN=Users,DC=hoebergen,DC=internal") {
+  Write-Error "The user $username has the Administrator role. Operation aborted." -ErrorAction Stop
+}
+
 # Disable the AD user
 try {
     Disable-ADAccount -Identity $username -Confirm:$false

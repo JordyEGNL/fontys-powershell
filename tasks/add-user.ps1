@@ -6,6 +6,7 @@
 param (
   [string]$fullname,
   [string]$department,
+  [string]$employeenumber,
   [string]$username,
   [string]$password,
   [securestring]$secpassword,
@@ -36,6 +37,10 @@ if (-not $fullname) {
 
 if (-not $department) {
   $department = Read-Host "Please provide the department of the user"
+}
+
+if (-not $employeenumber) {
+  $employeenumber = Read-Host "Please provide the employeenumber of the user"
 }
 
 if (-not $username) {
@@ -69,6 +74,7 @@ Write-Debug "Full Name: $fullname"
 Write-Debug "Department: $department"
 Write-Debug "Department Group: $departmentGroup"
 Write-Debug "Department OU: $departmentOU"
+Write-Debug "employeenumber: $employeenumber"
 Write-Debug "Password: $password"
 Write-Debug "Secure Password: $secpassword"
 
@@ -92,6 +98,7 @@ Write-Debug "Username: $username"
 try {
   New-ADUser `
     -Name $fullname `
+    -Employeenumber $employeenumber `
     -DisplayName $fullname `
     -Surname $lastname `
     -GivenName $firstname `

@@ -10,6 +10,7 @@
 param (
   [string]$fullName,
   [string]$department,
+  [string]$employeeNumber,
   [string]$vcUsername,
   [string]$vcPassword,
   [string]$adminUsername,
@@ -31,6 +32,7 @@ Usage: ./add-employee.ps1 <OPTIONS>
 Options:
   -fullname string          The full name of the employee
   -department string        The department of the employee
+  -employeenumber string    The employee number of the employee
   -vcusername string        The username of the vCenter Administrator
   -vcpassword string        The password of the vCenter Administrator
   -adminusername string     The username of the domain admin
@@ -56,15 +58,15 @@ if (!$adminPassword) {
   $adminPassword = $env:employeescript_domainAdminPassword
 }
 
-if (!$fullName -or !$department -or !$vcUsername -or !$vcPassword -or !$adminUsername -or !$adminPassword) {
+if (!$fullName -or !$department -or !$employeeNumber -or !$vcUsername -or !$vcPassword -or !$adminUsername -or !$adminPassword) {
   Show-WelcomeMessage
   exit 0
 }
 
 Write-Debug "Full Name: $fullName"
 $firstName = $fullName.Split(" ")[0]
-$randomVMID= Get-Random -Minimum 10 -Maximum 99
 Write-Debug "department: $department"
+Write-Debug "Employee Number: $employeeNumber"
 Write-Debug "vcUsername: $vcUsername"
 Write-Debug "vcPassword: $vcPassword"
 Write-Debug "adminUsername: $adminUsername"
@@ -94,15 +96,15 @@ $lastname = $names[1]
 $username = "$firstname.$lastname".ToLower()
 
 if ($debug) {
-  ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -secpassword $secpassword -debug
+  ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -employeenumber $employeeNumber -secpassword $secpassword -debug
 } else {
-  ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -secpassword $secpassword
+  ./tasks/add-user.ps1 -fullName $fullName -username $username -department $department -employeenumber $employeeNumber -secpassword $secpassword
 }
 
 if ($debug) {
-  ./tasks/add-vm.ps1 -vmname VM-$firstName-$randomVMID -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword -debug
+  ./tasks/add-vm.ps1 -vmname VM-$firstName-$employeeNumber -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword -debug
 } else {
-  ./tasks/add-vm.ps1 -vmname VM-$firstName-$randomVMID -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword
+  ./tasks/add-vm.ps1 -vmname VM-$firstName-$employeeNumber -vcUsername $vcUsername -vcPassword $vcPassword -adminUsername $adminUsername -adminpassword $adminPassword
 }
 
 # Send credentials

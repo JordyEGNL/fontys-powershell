@@ -63,7 +63,9 @@ Write-Debug "vCenter Password: $vcPassword"
 Write-Debug "Admin Username: $adminUsername"
 Write-Debug "Admin Password: $adminPassword"
 
-## Vcenter connection
+# 
+# Connect to the vcenter server
+#
 $vcServer = "vcenter.netlab.fontysict.nl"
 
 try {
@@ -74,15 +76,24 @@ try {
   exit 1
 }
 
-# VM variables
+# Set the default variables for the vm
 $resourcePool = "I533550"
 $folder = "I533550"
 $template = "Windows10T"
 $datastore = "DataCluster-Students"
 $networkName = "2720_I533550_PVlanA"
+$isVM = $false
 
-# Check if the VM already exists, if not create vm
-if (-not (Get-VM -Name $vmName -ErrorAction SilentlyContinue)) {
+#
+# Check if the VM already exists via name check
+#
+if ($vm = Get-VM -Name $vmName -ErrorAction SilentlyContinue) {
+  Write-Debug "VM $vmName already exists."
+  $isVM = $true
+}
+
+# Create the VM if it does not exist
+if (-not $isVM) {
   Write-Debug "Creating a new VM from a template..."
   $vm = New-VM -Name $vmName `
     -Template $template `
@@ -91,7 +102,14 @@ if (-not (Get-VM -Name $vmName -ErrorAction SilentlyContinue)) {
     -Location $folder
 }
 
-# Ensure the VM was successfully created before configuring the network
+# Delay to finish the VM creation (if the vm is created but not ready it is fine)
+Start-Sleep -Seconds 10
+
+# 
+# When vm is created, set the network adapter
+# If the vm already exists, dont do this
+# $vm is set when the vm is created
+#
 if ($vm) {
     Write-Debug "Checking if network adapter is already set..."
     $networkAdapter = Get-NetworkAdapter -VM $vm
@@ -105,18 +123,28 @@ if ($vm) {
     }
 } else {
     # If VM already exists
+    Write-Debug "VM already exists, not creating."
     $vm = Get-VM -Name $vmName
     if ($vm) {
-        Write-Host "VM already exists, not creating."
+        Write-Debug "Starting VM $vmName..."
+        # Power on the VM
+        if ($vm.PowerState -ne 'PoweredOn') {
+          Start-VM -VM $vm
+          Write-Debug "VM $vmName powered on."
+        }
     } else {
         Write-Error "Failed to create VM."
         exit 1
     }
 }
 
-# Power on the VM
-if ((Get-VM -Name $vmName).PowerState -ne 'PoweredOn') {
+#
+# Start the VM
+#
+if ($vm.PowerState -ne 'PoweredOn') {
+  Write-Debug "Starting VM $vmName..."
   Start-VM -VM $vm
+  Write-Debug "VM $vmName powered on."
 }
 
 # Retrieve the IP address of the VM from the vCenter try again every 10 seconds
@@ -138,13 +166,15 @@ if (-not $vmIP) {
 # Display IP address
 Write-Debug "IP of $vmName is $vmIP"
 
-# Disconnect from vCenter
+#
+# vcenter cleanup
+#
 Disconnect-VIServer -Server $vcServer -Confirm:$false
 
 
-###############################################
+#
 # Domain join
-###############################################
+#
 
 # Domain information
 $adminUsername = "HOEBERGEN\" + $adminUsername
@@ -187,5 +217,7 @@ if ($domainCheckResult -match 'Not in domain') {
     }
 }
 
-# Ensure the SSH process is terminated
+#
+# domain join cleanup
+#
 Stop-Process -Id $sshProcess.Id -Force
