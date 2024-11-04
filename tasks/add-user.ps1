@@ -88,7 +88,7 @@ $ErrorActionPreference = "Stop"
 # Split the fullname into first and last name
 $names = $fullname -split ' '
 $firstname = $names[0]
-$lastname = $names[1]
+$lastname = ($names[1..($names.Length - 1)] -join ' ')
 
 Write-Debug "First Name: $firstname"
 Write-Debug "Last Name: $lastname"

@@ -77,8 +77,6 @@ Write-Debug "Employee Number: $employeeNumber"
 Write-Debug "First Name: $firstName"
 Write-Debug "vcUsername: $vcUsername"
 Write-Debug "vcPassword: $vcPassword"
-Write-Debug "adminUsername: $adminUsername"
-Write-Debug "adminPassword: $adminPassword"
 Write-Debug "VM Name: $vmName"
 
 if ($debug) {

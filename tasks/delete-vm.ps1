@@ -56,11 +56,6 @@ try {
 }
 
 # Set the default variables for the vm
-$resourcePool = "I533550"
-$folder = "I533550"
-$template = "Windows10T"
-$datastore = "DataCluster-Students"
-$networkName = "2720_I533550_PVlanA"
 $isVM = $true
 
 #
@@ -76,10 +71,6 @@ if ( $isVM) {
     # Stop the VM
     Write-Debug "Stopping the VM $vmName..."
     Stop-VM -VM $vm -Confirm:$false
-
-    # Remove the VM
-    Write-Debug "Removing the VM $vmName..."
-    Remove-VM -VM $vm -DeleteFromDisk -Confirm:$false
 }
 
 #

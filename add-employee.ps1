@@ -91,7 +91,7 @@ $word3 = $null
 # Split the fullname into first and last name
 $names = $fullname -split ' '
 $firstname = $names[0]
-$lastname = $names[1]
+$lastname = ($names[1..($names.Length - 1)] -join '.').ToLower()
 # Create a username from the first and last name
 $username = "$firstname.$lastname".ToLower()
 
